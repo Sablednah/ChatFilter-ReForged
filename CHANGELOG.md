@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.0 — unreleased
+## 3.0.0 — 2026-10-09
 
 The NeoForge rebuild. The version carries on from the Bukkit plugin's 2.0.0.
 
@@ -16,7 +16,9 @@ The NeoForge rebuild. The version carries on from the Bukkit plugin's 2.0.0.
 - Strikes with a configurable escalation ladder; staff alerts with a per-person toggle.
 - Commands are parsed, and only their message is judged.
 - `/chatfilter test`, `add`, `remove`, `list`, `strikes` and `alerts`.
-- Integration with SableCraft Standards' chat, channels, `/msg`, `/r`, `/me` and `/mail`.
+- Integration with SableCraft Standards 1.11.0+: its chat, channels, `/msg`, `/r`, `/me` and `/mail`
+  are screened too, per viewer.
+- Keyword replies wait a moment (`[responses] delayTicks`) so they land after the line they answer.
 
 ### Fixed (from the Bukkit plugin)
 
