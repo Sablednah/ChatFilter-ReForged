@@ -67,8 +67,9 @@ public final class Messages {
                 ChatFormatting f = ChatFormatting.getByCode(code);
                 if (f != null) {
                     flush(out, run, style);
-                    style = f == ChatFormatting.RESET ? Style.EMPTY
-                            : f.isColor() ? Style.EMPTY.withColor(f) : style.applyFormat(f);
+                    // Vanilla's own legacy rule: a colour clears bold and friends, &r clears all.
+                    // (Not ChatFormatting.isColor(), which 26.2 removed.)
+                    style = style.applyLegacyFormat(f);
                     i += 2;
                     continue;
                 }
