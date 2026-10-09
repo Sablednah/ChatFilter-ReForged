@@ -13,6 +13,13 @@ tasks.named('wrapper', Wrapper).configure {
 // one. All lines share a mod version, and two files both called chatfilter-3.0.0.jar are
 // indistinguishable in a mods folder or on a releases page. The mod's own version (in
 // neoforge.mods.toml) stays a plain ${mod_version}.
+// A build directory per Windows test client (TestClient.cmd passes -PwinClient=<name>), so a client
+// never tries to delete the neoforge jar the running WSL dev server holds open. Same trick as
+// Standards; the expensive NeoForm output in ~/.gradle is still shared.
+if (project.hasProperty('winClient')) {
+    layout.buildDirectory = layout.projectDirectory.dir("build-win-${project.winClient}")
+}
+
 version = "${mod_version}+mc${minecraft_version}"
 group = mod_group_id
 
@@ -53,6 +60,23 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        // Two dev clients for live testing, launched from Windows by TestClient.cmd: you as staff,
+        // and TestBuddy as the player who swears. Offline names against the online-mode=false dev
+        // server, so no second account is needed. Own game directories, because sharing run/
+        // with the dev server means both fight over logs/latest.log on drvfs.
+        clientMain {
+            client()
+            programArguments.addAll '--username', 'Sablednah',
+                    '--quickPlayMultiplayer', "127.0.0.1:${project.dev_server_port}".toString()
+            gameDirectory = file('runMain')
+        }
+        clientBuddy {
+            client()
+            programArguments.addAll '--username', 'TestBuddy',
+                    '--quickPlayMultiplayer', "127.0.0.1:${project.dev_server_port}".toString()
+            gameDirectory = file('runBuddy')
         }
 
         server {

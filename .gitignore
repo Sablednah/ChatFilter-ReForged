@@ -46,3 +46,9 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Windows test clients (TestClient.cmd)
+/runMain/
+/runBuddy/
+/build-win-*/
+/.gradle-win-*/
