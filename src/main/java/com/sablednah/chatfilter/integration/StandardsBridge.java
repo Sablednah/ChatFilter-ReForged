@@ -32,8 +32,11 @@ public final class StandardsBridge {
             Class<?> chat = Class.forName("com.sablednah.standards.api.chat.Chat");
             Class<?> filter = Class.forName("com.sablednah.standards.api.chat.MessageFilter");
             chat.getMethod("registerFilter", filter);
+            // shadow() arrived with the seam in Standards 1.11.0. A seam without it is an
+            // unreleased prototype, and not worth a fallback.
+            Class.forName("com.sablednah.standards.api.chat.Screening").getMethod("shadow");
         } catch (ReflectiveOperationException | LinkageError e) {
-            ChatFilter.LOGGER.warn("ChatFilter: this version of Standards has no message-filter seam. "
+            ChatFilter.LOGGER.warn("ChatFilter: this version of Standards has no message-filter seam (it arrived in 1.11.0). "
                     + "Plain chat and commands are still filtered, but Standards' formatted chat, party "
                     + "and faction channels, /r and /mail are not. Update Standards to fix that.");
             return;

@@ -35,9 +35,10 @@ old project page is in it.
 
 ## With SableCraft Standards
 
-If [Standards](https://github.com/Sablednah/SableCraft-Standards) is installed, ChatFilter screens
+If [Standards](https://github.com/Sablednah/SableCraft-Standards) 1.11.0 or later is installed, ChatFilter screens
 everything Standards delivers itself: formatted chat, party and faction channels, `/msg`, `/r`,
-`/me` and `/mail`. Each viewer gets their own copy, so the silent mask works there too. Without
+`/me` and `/mail`. Each viewer gets their own copy, so the silent mask works there too, and a
+shadowed line looks to its sender exactly as Standards would have shown it. Without
 Standards nothing is lost; plain vanilla chat and commands are filtered either way.
 
 ## Commands
