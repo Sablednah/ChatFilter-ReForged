@@ -23,9 +23,29 @@ public final class Strikes {
      * @param kind  {@code alert}, {@code tell} or {@code command}
      * @param value the message or command; {@code {player}} and {@code {strikes}} are filled in
      */
-    public record Step(int at, String kind, String value) {
+    public static final class Step {
+        private final int at;
+        private final String kind;
+        private final String value;
 
-        /**
+        public Step(int at, String kind, String value) {
+            this.at = at;
+            this.kind = kind;
+            this.value = value;
+        }
+
+        public int at() {
+            return at;
+        }
+
+        public String kind() {
+            return kind;
+        }
+
+        public String value() {
+            return value;
+        }
+/**
          * Parse {@code "5 = command kick {player} Language"}. Returns null for anything that does
          * not parse, so one typo costs one rung rather than the whole ladder.
          */
@@ -33,11 +53,11 @@ public final class Strikes {
             int eq = line.indexOf('=');
             if (eq < 0) return null;
             try {
-                int at = Integer.parseInt(line.substring(0, eq).strip());
-                String rest = line.substring(eq + 1).strip();
+                int at = Integer.parseInt(line.substring(0, eq).trim());
+                String rest = line.substring(eq + 1).trim();
                 int sp = rest.indexOf(' ');
                 String kind = (sp < 0 ? rest : rest.substring(0, sp)).toLowerCase(java.util.Locale.ROOT);
-                String value = sp < 0 ? "" : rest.substring(sp + 1).strip();
+                String value = sp < 0 ? "" : rest.substring(sp + 1).trim();
                 if (at < 1 || !(kind.equals("alert") || kind.equals("tell") || kind.equals("command"))) {
                     return null;
                 }

@@ -8,7 +8,29 @@ package com.sablednah.chatfilter.core;
  *                 such as caps or flooding
  * @param term     the list entry, pattern or rule that matched — for logs and {@code /chatfilter test}
  */
-public record Hit(String category, Span span, String term) {
+public final class Hit {
+
+    private final String category;
+    private final Span span;
+    private final String term;
+
+    public Hit(String category, Span span, String term) {
+        this.category = category;
+        this.span = span;
+        this.term = term;
+    }
+
+    public String category() {
+        return category;
+    }
+
+    public Span span() {
+        return span;
+    }
+
+    public String term() {
+        return term;
+    }
 
     public boolean wholeMessage() {
         return span == null;

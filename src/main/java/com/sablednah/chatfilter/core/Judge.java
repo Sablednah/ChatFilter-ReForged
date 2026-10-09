@@ -21,7 +21,7 @@ public final class Judge {
     private final String censorText;
 
     public Judge(Map<String, CategoryPolicy> policies, CensorStyle style, String censorText) {
-        this.policies = Map.copyOf(policies);
+        this.policies = java.util.Collections.unmodifiableMap(new java.util.HashMap<>(policies));
         this.style = style;
         this.censorText = censorText;
     }
@@ -43,7 +43,7 @@ public final class Judge {
         }
         String decider = null;
         Action firmest = Action.LOG;
-        for (var e : byCategory.entrySet()) {
+        for (Map.Entry<String, Action> e : byCategory.entrySet()) {
             if (decider == null || e.getValue().compareTo(firmest) > 0) {
                 decider = e.getKey();
                 firmest = e.getValue();
@@ -53,10 +53,10 @@ public final class Judge {
             return Outcome.pass(hits);
         }
         if (firmest == Action.BLOCK) {
-            return new Outcome(Outcome.Kind.BLOCK, null, List.of(), decider, hits);
+            return new Outcome(Outcome.Kind.BLOCK, null, java.util.Collections.emptyList(), decider, hits);
         }
         if (firmest == Action.SHADOW) {
-            return new Outcome(Outcome.Kind.SHADOW, null, List.of(), decider, hits);
+            return new Outcome(Outcome.Kind.SHADOW, null, java.util.Collections.emptyList(), decider, hits);
         }
 
         List<Span> replace = new ArrayList<>();
@@ -80,12 +80,12 @@ public final class Judge {
 
         if (replace.isEmpty() && !lowercase) {
             return mask.isEmpty()
-                    ? new Outcome(Outcome.Kind.PASS, null, List.of(), decider, hits)
-                    : new Outcome(Outcome.Kind.MASK, null, List.copyOf(mask), decider, hits);
+                    ? new Outcome(Outcome.Kind.PASS, null, java.util.Collections.emptyList(), decider, hits)
+                    : new Outcome(Outcome.Kind.MASK, null, java.util.Collections.unmodifiableList(new java.util.ArrayList<>(mask)), decider, hits);
         }
         String text = lowercase ? Censor.lowercase(original) : original;
         text = Censor.mask(text, mask);
         text = Censor.apply(text, replace, style, censorText);
-        return new Outcome(Outcome.Kind.REWRITE, text, List.of(), decider, hits);
+        return new Outcome(Outcome.Kind.REWRITE, text, java.util.Collections.emptyList(), decider, hits);
     }
 }
