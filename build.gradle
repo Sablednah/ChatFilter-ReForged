@@ -256,3 +256,19 @@ idea {
         downloadJavadoc = true
     }
 }
+
+// core/ is shared VERBATIM with the Bukkit plugin (Sablednah/ChatFilter, branch main), which runs on
+// 1.7-1.16 servers and so compiles to Java 8 bytecode. Keep core Java 8 clean: no records, switch
+// expressions, var, List.of and friends. This compiles it on its own at --release 8, so a slip fails
+// here rather than in the other repo.
+tasks.register('coreJava8', JavaCompile) {
+    group = 'verification'
+    description = 'Compiles core/ alone at Java 8, as the Bukkit build does'
+    source = fileTree('src/main/java/com/sablednah/chatfilter/core')
+    classpath = files()
+    destinationDirectory = layout.buildDirectory.dir('coreJava8')
+    options.release = 8
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:-options'
+}
+tasks.named('check').configure { dependsOn 'coreJava8' }

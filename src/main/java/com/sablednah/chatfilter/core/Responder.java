@@ -17,21 +17,41 @@ import java.util.regex.Pattern;
 public final class Responder {
 
     /** One response: any of {@code triggers}, as a whole word, gets {@code reply}. */
-    public record Rule(List<Pattern> triggers, String label, String reply) {
+    public static final class Rule {
+        private final List<Pattern> triggers;
+        private final String label;
+        private final String reply;
 
-        /** Parse {@code "eleven|11 = That's ridiculous, it's not even funny."}; null if malformed. */
+        public Rule(List<Pattern> triggers, String label, String reply) {
+            this.triggers = triggers;
+            this.label = label;
+            this.reply = reply;
+        }
+
+        public List<Pattern> triggers() {
+            return triggers;
+        }
+
+        public String label() {
+            return label;
+        }
+
+        public String reply() {
+            return reply;
+        }
+/** Parse {@code "eleven|11 = That's ridiculous, it's not even funny."}; null if malformed. */
         public static Rule parse(String line) {
             int eq = line.indexOf('=');
             if (eq < 1) return null;
-            String reply = line.substring(eq + 1).strip();
+            String reply = line.substring(eq + 1).trim();
             if (reply.isEmpty()) return null;
             List<Pattern> triggers = new ArrayList<>();
             for (String t : line.substring(0, eq).split("\\|")) {
-                String w = t.strip().toLowerCase(Locale.ROOT);
+                String w = t.trim().toLowerCase(Locale.ROOT);
                 if (w.isEmpty()) continue;
                 triggers.add(Pattern.compile("(?<![\\p{L}\\p{N}])" + Pattern.quote(w) + "(?![\\p{L}\\p{N}])"));
             }
-            return triggers.isEmpty() ? null : new Rule(triggers, line.substring(0, eq).strip(), reply);
+            return triggers.isEmpty() ? null : new Rule(triggers, line.substring(0, eq).trim(), reply);
         }
     }
 

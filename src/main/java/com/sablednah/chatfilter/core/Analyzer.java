@@ -18,9 +18,47 @@ import java.util.regex.PatternSyntaxException;
 public final class Analyzer {
 
     /** A compiled word-list category. */
-    private record CompiledList(String name, List<Term> terms, List<Pattern> allowed) {}
+    private static final class CompiledList {
+        private final String name;
+        private final List<Term> terms;
+        private final List<Pattern> allowed;
 
-    private record Term(String label, Pattern pattern) {}
+        CompiledList(String name, List<Term> terms, List<Pattern> allowed) {
+            this.name = name;
+            this.terms = terms;
+            this.allowed = allowed;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public List<Term> terms() {
+            return terms;
+        }
+
+        public List<Pattern> allowed() {
+            return allowed;
+        }
+    }
+
+    private static final class Term {
+        private final String label;
+        private final Pattern pattern;
+
+        Term(String label, Pattern pattern) {
+            this.label = label;
+            this.pattern = pattern;
+        }
+
+        public String label() {
+            return label;
+        }
+
+        public Pattern pattern() {
+            return pattern;
+        }
+    }
 
     private final Normalizer normalizer;
     private final List<CompiledList> lists = new ArrayList<>();
@@ -39,19 +77,19 @@ public final class Analyzer {
                 match.leet() ? TermCompiler.LEET_SYMBOLS : (match.wildcards() ? "*" : ""));
         TermCompiler compiler = new TermCompiler(match.leet(), match.wildcards());
         List<String> suffixes = match.suffixes().stream()
-                .map(s -> s.toLowerCase(Locale.ROOT).strip()).filter(s -> !s.isEmpty()).toList();
+                .map(s -> s.toLowerCase(Locale.ROOT).trim()).filter(s -> !s.isEmpty()).collect(java.util.stream.Collectors.toList());
 
         for (WordListSettings list : wordLists) {
             if (!list.policy().enabled()) continue;
             List<Term> terms = new ArrayList<>();
             for (String t : list.anywhere()) {
-                if (!t.isBlank()) terms.add(new Term(t.strip(), compiler.anywhere(t)));
+                if (!t.trim().isEmpty()) terms.add(new Term(t.trim(), compiler.anywhere(t)));
             }
             for (String t : list.words()) {
-                if (!t.isBlank()) terms.add(new Term(t.strip(), compiler.word(t, suffixes)));
+                if (!t.trim().isEmpty()) terms.add(new Term(t.trim(), compiler.word(t, suffixes)));
             }
             for (String p : list.patterns()) {
-                if (p.isBlank()) continue;
+                if (p.trim().isEmpty()) continue;
                 try {
                     terms.add(new Term("/" + p + "/", Pattern.compile(p, Pattern.CASE_INSENSITIVE
                             | Pattern.UNICODE_CASE)));
@@ -63,7 +101,7 @@ public final class Analyzer {
                 }
             }
             List<Pattern> allowed = list.allowed().stream()
-                    .filter(a -> !a.isBlank()).map(TermCompiler::literal).toList();
+                    .filter(a -> !a.trim().isEmpty()).map(TermCompiler::literal).collect(java.util.stream.Collectors.toList());
             lists.add(new CompiledList(list.name(), terms, allowed));
         }
 
@@ -74,7 +112,7 @@ public final class Analyzer {
                     : "\\.";
             String tlds = String.join("|", links.tlds().stream()
                     .map(t -> Pattern.quote(t.toLowerCase(Locale.ROOT).replaceFirst("^\\.", "")))
-                    .toList());
+                    .collect(java.util.stream.Collectors.toList()));
             this.dotPattern = Pattern.compile(dot);
             this.linkPattern = Pattern.compile(
                     "(?<![\\p{L}\\p{N}-])(?:[a-z][a-z0-9+.-]*://)?"
@@ -94,7 +132,7 @@ public final class Analyzer {
 
     /** Configuration mistakes found while compiling — bad regular expressions, mostly. */
     public List<String> problems() {
-        return List.copyOf(problems);
+        return java.util.Collections.unmodifiableList(new java.util.ArrayList<>(problems));
     }
 
     /** Every hit in {@code original}, in no particular order. */
@@ -168,7 +206,7 @@ public final class Analyzer {
     private boolean allowedDomain(String host) {
         String h = host.toLowerCase(Locale.ROOT).replaceFirst("^www\\.", "");
         for (String allowed : links.allowedDomains()) {
-            String a = allowed.toLowerCase(Locale.ROOT).strip().replaceFirst("^www\\.", "");
+            String a = allowed.toLowerCase(Locale.ROOT).trim().replaceFirst("^www\\.", "");
             if (a.isEmpty()) continue;
             if (h.equals(a) || h.endsWith("." + a)) return true;
         }

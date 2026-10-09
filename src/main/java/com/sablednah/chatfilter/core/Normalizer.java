@@ -27,23 +27,17 @@ public final class Normalizer {
      * nothing is — but covers the ones that actually turn up, from Cyrillic and Greek keyboards and
      * from the "fancy text" generators people paste from.
      */
-    private static final Map<Character, String> LOOKALIKES = Map.ofEntries(
-            // Cyrillic
-            Map.entry('а', "a"), Map.entry('в', "b"), Map.entry('е', "e"), Map.entry('ё', "e"),
-            Map.entry('к', "k"), Map.entry('м', "m"), Map.entry('н', "h"), Map.entry('о', "o"),
-            Map.entry('р', "p"), Map.entry('с', "c"), Map.entry('т', "t"), Map.entry('у', "y"),
-            Map.entry('х', "x"), Map.entry('і', "i"), Map.entry('ї', "i"), Map.entry('ј', "j"),
-            Map.entry('ѕ', "s"), Map.entry('ԁ', "d"), Map.entry('ԛ', "q"), Map.entry('ԝ', "w"),
-            Map.entry('ь', "b"), Map.entry('п', "n"), Map.entry('г', "r"), Map.entry('ц', "u"),
-            // Greek
-            Map.entry('α', "a"), Map.entry('β', "b"), Map.entry('ε', "e"), Map.entry('η', "n"),
-            Map.entry('ι', "i"), Map.entry('κ', "k"), Map.entry('ν', "v"), Map.entry('ο', "o"),
-            Map.entry('ρ', "p"), Map.entry('τ', "t"), Map.entry('υ', "u"), Map.entry('χ', "x"),
-            Map.entry('ω', "w"), Map.entry('μ', "u"),
-            // Latin letters NFKD leaves alone
-            Map.entry('ß', "ss"), Map.entry('æ', "ae"), Map.entry('œ', "oe"), Map.entry('ø', "o"),
-            Map.entry('đ', "d"), Map.entry('ł', "l"), Map.entry('ı', "i"), Map.entry('ħ', "h"),
-            Map.entry('ŧ', "t"), Map.entry('þ', "th"), Map.entry('ð', "d"));
+    private static final Map<Character, String> LOOKALIKES = lookalikes(
+                // Cyrillic, then Greek, then Latin letters NFKD leaves alone
+                'а', "a", 'в', "b", 'е', "e", 'ё', "e", 'к', "k", 'м', "m",
+                'н', "h", 'о', "o", 'р', "p", 'с', "c", 'т', "t", 'у', "y",
+                'х', "x", 'і', "i", 'ї', "i", 'ј', "j", 'ѕ', "s", 'ԁ', "d",
+                'ԛ', "q", 'ԝ', "w", 'ь', "b", 'п', "n", 'г', "r", 'ц', "u",
+                'α', "a", 'β', "b", 'ε', "e", 'η', "n", 'ι', "i", 'κ', "k",
+                'ν', "v", 'ο', "o", 'ρ', "p", 'τ', "t", 'υ', "u", 'χ', "x",
+                'ω', "w", 'μ', "u", 'ß', "ss", 'æ', "ae", 'œ', "oe", 'ø', "o",
+                'đ', "d", 'ł', "l", 'ı', "i", 'ħ', "h", 'ŧ', "t", 'þ', "th",
+                'ð', "d");
 
     /** Things that stand between spelled-out letters: {@code s.h.i.t}, {@code s-h-i-t}, {@code s h i t}. */
     private static final String SEPARATORS = " \t.,-_~'\"`+/\\:;=^";
@@ -253,5 +247,14 @@ public final class Normalizer {
         int[] toArray() {
             return java.util.Arrays.copyOf(data, size);
         }
+    }
+
+    /** Pairs of (look-alike, replacement). Built by hand because Map.ofEntries is Java 9. */
+    private static Map<Character, String> lookalikes(Object... pairs) {
+        Map<Character, String> m = new java.util.HashMap<>();
+        for (int k = 0; k < pairs.length; k += 2) {
+            m.put((Character) pairs[k], (String) pairs[k + 1]);
+        }
+        return java.util.Collections.unmodifiableMap(m);
     }
 }
