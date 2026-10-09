@@ -12,6 +12,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
 
 /** The game-bus side: chat, commands, logout, the {@code /chatfilter} command and the nodes. */
@@ -49,6 +50,11 @@ public final class ChatEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onCommand(CommandEvent event) {
         CommandScreen.screen(event);
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(ServerTickEvent.Post event) {
+        FilterService.tick(event.getServer());
     }
 
     @SubscribeEvent
