@@ -1,0 +1,44 @@
+# ChatFilter ReForged — neoforge.mods.toml (values are expanded from gradle.properties at build time).
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/Sablednah/ChatFilter-ReForged/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+description='''
+${mod_description}
+'''
+displayURL="https://github.com/Sablednah/ChatFilter-ReForged"
+
+# Two small mixins hand vanilla's own chat filter a mask, so a censored line stays signed vanilla
+# chat and the client draws the ###. See mixin/ServerPlayerFilterMixin before porting a line.
+[[mixins]]
+config="chatfilter.mixins.json"
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# OPTIONAL. With Standards, its formatted chat, routed party/faction channels, /msg, /r, /me and
+# /mail are screened through its filter seam. No floor here on purpose: an older Standards without
+# the seam is detected at startup and reported, and ChatFilter carries on without it.
+[[dependencies.${mod_id}]]
+    modId="standards"
+    type="optional"
+    versionRange="*"
+    ordering="AFTER"
+    side="BOTH"
