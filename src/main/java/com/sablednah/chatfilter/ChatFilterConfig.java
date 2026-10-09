@@ -125,6 +125,7 @@ public final class ChatFilterConfig {
     // ------------------------------------------------------------------ responses
     public static final ModConfigSpec.BooleanValue RESPONSES_ENABLED;
     public static final ModConfigSpec.IntValue RESPONSE_COOLDOWN;
+    public static final ModConfigSpec.IntValue RESPONSE_DELAY;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> RESPONSES;
 
     // ------------------------------------------------------------------ messages
@@ -246,6 +247,8 @@ public final class ChatFilterConfig {
         B.comment("Automatic replies to keywords. 'trigger|other trigger = reply'. Whole words only.").push("responses");
         RESPONSES_ENABLED = B.define("enabled", true);
         RESPONSE_COOLDOWN = B.comment("Seconds before the same reply can fire again.").defineInRange("cooldownSeconds", 30, 0, 86400);
+        RESPONSE_DELAY = B.comment("Ticks to wait before replying (20 = one second), so the reply lands after the line",
+                "it answers rather than racing it.").defineInRange("delayTicks", 10, 1, 200);
         RESPONSES = B.comment("Empty the list to have none. It stays empty.")
                 .defineListAllowEmpty("rules", List.of("eleven|11 = That's ridiculous, it's not even funny."),
                         () -> "", ChatFilterConfig::isString);

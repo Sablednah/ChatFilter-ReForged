@@ -43,6 +43,11 @@ public final class FilterService {
     private static final Strikes STRIKES = new Strikes();
     private static final Responder RESPONDER = new Responder();
 
+    /** A reply waiting for its tick. */
+    private record Pending(int dueTick, List<String> replies, Map<String, String> values) {}
+
+    private static final java.util.ArrayDeque<Pending> PENDING = new java.util.ArrayDeque<>();
+
     private FilterService() {}
 
     /** What would happen, with no side effects. Bypass and the links permission are honoured. */
@@ -204,13 +209,29 @@ public final class FilterService {
         if (replies.isEmpty()) return;
         MinecraftServer server = player.level().getServer();
         if (server == null) return;
-        Map<String, String> values = Map.of("player", name(player));
-        // A tick later, as the old plugin did, so the reply lands after the line it answers.
-        server.schedule(new TickTask(server.getTickCount() + 1, () -> {
-            for (String reply : replies) {
-                server.getPlayerList().broadcastSystemMessage(Messages.colour(Messages.fill(reply, values)), false);
+        // Queued and released from the server tick, NOT server.schedule(new TickTask(tick + 1)):
+        // the server runs tick-dated tasks early whenever it has time to spare, while vanilla
+        // delivers the chat line itself through a queued task of its own, so "next tick" lost the
+        // race and the reply arrived before the line it answers. Found in a live test.
+        synchronized (PENDING) {
+            PENDING.addLast(new Pending(server.getTickCount() + ChatFilterConfig.RESPONSE_DELAY.get(),
+                    replies, Map.of("player", name(player))));
+        }
+    }
+
+    /** Release any replies that are due. Called at the end of every server tick. */
+    public static void tick(MinecraftServer server) {
+        List<Pending> due = new ArrayList<>();
+        synchronized (PENDING) {
+            while (!PENDING.isEmpty() && PENDING.peekFirst().dueTick() <= server.getTickCount()) {
+                due.add(PENDING.pollFirst());
             }
-        }));
+        }
+        for (Pending p : due) {
+            for (String reply : p.replies()) {
+                server.getPlayerList().broadcastSystemMessage(Messages.colour(Messages.fill(reply, p.values())), false);
+            }
+        }
     }
 
     private static long decayMillis() {
