@@ -7,7 +7,6 @@ import com.sablednah.standards.api.chat.Chat;
 import com.sablednah.standards.api.chat.MessageFilter;
 import com.sablednah.standards.api.chat.Screening;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 /** The one class that imports Standards. Loaded only by {@link StandardsBridge} after its check. */
@@ -30,16 +29,9 @@ final class StandardsFilter {
                     case PASS -> Screening.pass();
                     // The sender has already been told, if their category says to.
                     case BLOCK -> Screening.block(null);
-                    case SHADOW -> {
-                        // Standards has no "deliver to the sender only", so the shadow is a block
-                        // plus a copy of the line for them. Plain vanilla form: close enough that
-                        // they have no reason to wonder.
-                        if (chat) {
-                            sender.sendSystemMessage(Component.translatable("chat.type.text",
-                                    sender.getDisplayName(), Component.literal(text)));
-                        }
-                        yield Screening.block(null);
-                    }
+                    // Standards delivers the sender's own copy in its real format: decorations,
+                    // nickname, the /msg confirmation. Nobody else gets it.
+                    case SHADOW -> Screening.shadow();
                     // The sender and chatfilter.see keep the original; vanilla's own delivery of
                     // the same line is already masked, so Standards may leave it alone.
                     case MASK -> Screening.censor(outcome.censoredText(text),
