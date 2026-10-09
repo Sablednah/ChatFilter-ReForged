@@ -43,7 +43,10 @@ public final class ChatFilter {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public ChatFilter(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.COMMON, ChatFilterConfig.SPEC);
+        // LOCAL is what FML 12.0.8 (NeoForge 26.3.0.37+) calls COMMON. The file name is given
+        // explicitly: LOCAL would otherwise name it chatfilter-local.toml, and a server moving up
+        // from 26.2 would silently start from defaults.
+        modContainer.registerConfig(ModConfig.Type.LOCAL, ChatFilterConfig.SPEC, "chatfilter-common.toml");
         modEventBus.addListener(ChatFilter::onConfig);
         modEventBus.addListener(ChatFilter::onConfigReload);
         modEventBus.addListener(ChatFilter::onSetup);
