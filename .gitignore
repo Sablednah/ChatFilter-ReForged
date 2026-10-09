@@ -52,3 +52,6 @@ repo/
 /runBuddy/
 /build-win-*/
 /.gradle-win-*/
+
+### Fetched dependency jars (scripts/fetch-standards.sh)
+/libs/

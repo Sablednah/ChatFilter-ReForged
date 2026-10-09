@@ -46,10 +46,15 @@ powershell -NoProfile -Command ^
   "Set-Content -Path $f -Value $lines"
 
 rem Standards is loaded on both sides so the mod lists match - NeoForge
-rem refuses a mismatch with only "bad network protocol". Until Standards
-rem 1.11.0 is merged, it comes from the seam worktree; override with
-rem   set STANDARDS_LIBS=..\SableCraft-Standards\build\libs
-if "%STANDARDS_LIBS%"=="" set "STANDARDS_LIBS=../SableCraft-Standards-worktrees/main/build/libs"
+rem refuses a mismatch with only "bad network protocol". It comes from the
+rem published release in libs\standards (scripts/fetch-standards.sh, run from
+rem WSL). Override with: set STANDARDS_LIBS=..\SableCraft-Standards\build\libs
+if "%STANDARDS_LIBS%"=="" set "STANDARDS_LIBS=libs/standards"
+if not exist "%STANDARDS_LIBS%" (
+    echo No Standards jars in %STANDARDS_LIBS% - run scripts/fetch-standards.sh from WSL first.
+    pause
+    exit /b 1
+)
 
 echo Starting %WHO% (first run compiles - be patient)...
 call gradlew.bat %TASK% --project-cache-dir .gradle-win-%WHO% -PwinClient=%WHO% -PwithStandards -Pstandards_libs=%STANDARDS_LIBS%
