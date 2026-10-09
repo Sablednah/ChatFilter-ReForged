@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/banner.png" alt="ChatFilter ReForged" width="480"></p>
+
 # ChatFilter ReForged
 
 A server-side chat filter for NeoForge. It censors or stops words in chat and in chat-like commands,
