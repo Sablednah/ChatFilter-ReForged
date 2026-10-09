@@ -11,7 +11,41 @@ import java.util.List;
  * @param decider  the category whose action won — whose message the sender may be told
  * @param hits     everything that was found, whether or not it changed anything
  */
-public record Outcome(Kind kind, String text, List<Span> mask, String decider, List<Hit> hits) {
+public final class Outcome {
+
+    private final Kind kind;
+    private final String text;
+    private final List<Span> mask;
+    private final String decider;
+    private final List<Hit> hits;
+
+    public Outcome(Kind kind, String text, List<Span> mask, String decider, List<Hit> hits) {
+        this.kind = kind;
+        this.text = text;
+        this.mask = mask;
+        this.decider = decider;
+        this.hits = hits;
+    }
+
+    public Kind kind() {
+        return kind;
+    }
+
+    public String text() {
+        return text;
+    }
+
+    public List<Span> mask() {
+        return mask;
+    }
+
+    public String decider() {
+        return decider;
+    }
+
+    public List<Hit> hits() {
+        return hits;
+    }
 
     public enum Kind {
         /** Nothing to change. There may still be {@link Action#LOG} hits to report. */
@@ -27,7 +61,7 @@ public record Outcome(Kind kind, String text, List<Span> mask, String decider, L
     }
 
     public static Outcome pass(List<Hit> hits) {
-        return new Outcome(Kind.PASS, null, List.of(), null, hits);
+        return new Outcome(Kind.PASS, null, java.util.Collections.<Span>emptyList(), null, hits);
     }
 
     public boolean changes() {
@@ -40,10 +74,13 @@ public record Outcome(Kind kind, String text, List<Span> mask, String decider, L
 
     /** What a viewer who does not see the original reads, for paths that deliver text rather than masks. */
     public String censoredText(String original) {
-        return switch (kind) {
-            case MASK -> Censor.mask(original, mask);
-            case REWRITE -> text;
-            default -> original;
-        };
+        switch (kind) {
+            case MASK:
+                return Censor.mask(original, mask);
+            case REWRITE:
+                return text;
+            default:
+                return original;
+        }
     }
 }

@@ -21,19 +21,19 @@ import java.util.regex.Pattern;
 public final class TermCompiler {
 
     /** What each letter may be written as, beyond itself. The old plugin's map, and then some. */
-    private static final Map<Character, String> LEET = Map.ofEntries(
-            Map.entry('a', "4@^"),
-            Map.entry('b', "8"),
-            Map.entry('c', "(<{["),
-            Map.entry('e', "3&"),
-            Map.entry('g', "69"),
-            Map.entry('h', "#"),
-            Map.entry('i', "1!|l"),
-            Map.entry('l', "1|!i"),
-            Map.entry('o', "0"),
-            Map.entry('s', "5$z"),
-            Map.entry('t', "7+"),
-            Map.entry('z', "2"));
+    private static final Map<Character, String> LEET = pairs(
+            'a', "4@^",
+            'b', "8",
+            'c', "(<{[",
+            'e', "3&",
+            'g', "69",
+            'h', "#",
+            'i', "1!|l",
+            'l', "1|!i",
+            'o', "0",
+            's', "5$z",
+            't', "7+",
+            'z', "2");
 
     /** Every symbol {@link #LEET} uses, so the {@link Normalizer} can treat them as letters. */
     public static final String LEET_SYMBOLS = "4@^8(<{[3&69#1!|057$+2*";
@@ -75,7 +75,7 @@ public final class TermCompiler {
     }
 
     private String body(String term) {
-        String t = term.toLowerCase(Locale.ROOT).strip();
+        String t = term.toLowerCase(Locale.ROOT).trim();
         StringBuilder p = new StringBuilder();
         int i = 0;
         while (i < t.length()) {
@@ -118,5 +118,14 @@ public final class TermCompiler {
             cls.append(x);
         }
         return cls.append(']').toString();
+    }
+
+    /** Pairs of (letter, alternatives). Built by hand because Map.ofEntries is Java 9. */
+    private static Map<Character, String> pairs(Object... kv) {
+        Map<Character, String> m = new java.util.HashMap<>();
+        for (int k = 0; k < kv.length; k += 2) {
+            m.put((Character) kv[k], (String) kv[k + 1]);
+        }
+        return java.util.Collections.unmodifiableMap(m);
     }
 }

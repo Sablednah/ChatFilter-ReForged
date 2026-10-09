@@ -50,19 +50,26 @@ public final class Censor {
     }
 
     private static String replacement(String word, CensorStyle style, String text) {
-        return switch (style) {
-            case FIXED -> text;
-            case REPEAT -> {
+        switch (style) {
+            case FIXED:
+                return text;
+            case REPEAT: {
                 char c = text.isEmpty() ? '*' : text.charAt(0);
-                yield String.valueOf(c).repeat(word.length());
+                return repeat(c, word.length());
             }
-            case GRAWLIX -> {
+            default: {
                 StringBuilder b = new StringBuilder(word.length());
                 for (int i = 0; i < word.length(); i++) {
                     b.append(GRAWLIX.charAt(i % GRAWLIX.length()));
                 }
-                yield b.toString();
+                return b.toString();
             }
-        };
+        }
+    }
+
+    private static String repeat(char c, int n) {
+        StringBuilder b = new StringBuilder(n);
+        for (int i = 0; i < n; i++) b.append(c);
+        return b.toString();
     }
 }

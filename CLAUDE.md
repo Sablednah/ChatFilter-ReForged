@@ -65,6 +65,14 @@ masked characters as `#`. Facts checked in the 1.21.11 sources (`ServerGamePacke
 **When porting, check those two `ServerPlayer` methods and the call sites above first.**
 `defaultRequire = 1` makes a renamed method fail at startup, not silently.
 
+## core/ is shared with the Bukkit plugin
+
+`core/` is copied verbatim into the Bukkit back-port (`../ChatFilter`, branch `main`), which runs on
+1.7-1.16 servers and compiles to **Java 8**. So core stays Java 8: final classes, not records;
+plain `switch`; no `var`, `List.of`, `String.strip`. `./gradlew coreJava8` (part of `check`)
+compiles it alone at `--release 8`. Change core here, then copy it there; never edit the Bukkit
+copy.
+
 ## Branches
 
 Same as MobHealth: `main` = 1.21.11, `mc26.1`, `mc26.2`, `mc26.3`. Features land on `main` and
