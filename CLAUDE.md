@@ -17,9 +17,12 @@ export JAVA_HOME=/mnt/d/Repos/sable/MobHealth-Forge/tools/jdk21   # jdk25 on the
 ./gradlew build                                 # build/libs/chatfilter-<v>+mc<mc>.jar
 ```
 
-- Standards is found by `standards_libs` in `gradle.properties` (default
-  `../SableCraft-Standards/build/libs`), version-matched to `minecraft_version`. Override with
-  `-Pstandards_libs=...` to build against a worktree.
+- Standards comes from its **published release**: `scripts/fetch-standards.sh` downloads the jars
+  for `standards_version` into `libs/standards/` (gitignored), the default `standards_libs`. Run it
+  once per fresh clone. To test unreleased Standards work, pass
+  `-Pstandards_libs=../SableCraft-Standards/build/libs`. Don't point the default at a sibling's
+  build folder: a worktree that has since been cleaned up breaks the build with
+  "package com.sablednah.standards... does not exist".
 - `run/server.properties` uses port **25580**, so it cannot collide with the siblings' dev servers.
   Kill a dev server by matching **this repo's** classes path, never `fml.modFolders` alone:
   `ps -eo pid,args | grep "[f]ml.modFolders" | grep "ChatFilter-ReForged/build"`.
