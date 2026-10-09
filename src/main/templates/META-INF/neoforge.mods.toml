@@ -13,6 +13,16 @@ description='''
 ${mod_description}
 '''
 displayURL="https://github.com/Sablednah/ChatFilter-ReForged"
+# Declared three ways, as MobHealth does; older loaders ignore the keys they do not know:
+#   iconFile   - the small square beside the name in the mod list (26.2+)
+#   bannerFile - the wide image in the info panel (26.2+), drawn at its own aspect ratio
+#   logoFile   - what 1.21.x and 26.1 show in the info panel
+# Both are antialiased artwork on transparent backgrounds, so they are smoothed, not snapped.
+iconFile="chatfilter-icon.png"
+bannerFile="chatfilter-banner.png"
+logoFile="chatfilter-banner.png"
+logoBlur=true
+iconBlur=true
 
 # Two small mixins hand vanilla's own chat filter a mask, so a censored line stays signed vanilla
 # chat and the client draws the ###. See mixin/ServerPlayerFilterMixin before porting a line.
